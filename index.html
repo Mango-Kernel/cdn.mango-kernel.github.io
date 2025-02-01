@@ -38,6 +38,15 @@
         background-color: #202124;
         border-radius: 4px;
       }
+
+      td tr, td table {
+        border-collapse: collapse !important;
+        border-radius: 0px;
+        border: none !important;
+        background-color: transparent;
+        width: 98%;
+      }
+
       tr:hover, td:hover {
           background-color: #3c4045;
       }
@@ -47,12 +56,12 @@
         color: white;
         transition: all 0.3s;
       }
-      tr:hover a {
+      /*tr:hover a {
         border:2px #3c4045 solid;
         border-radius: 10px;
         padding:4px;
         background-color: #3c4045;
-      }
+      }*/
         @keyframes h1 {
             0% { background-image: linear-gradient(270deg, #ff0000, #ff7300, #ffea00, #00ff00, #00ffe1, #0033ff, #a300ff, #ff00b8); }
             12.5% { background-image: linear-gradient(270deg, #ff7300, #ffea00, #00ff00, #00ffe1, #0033ff, #a300ff, #ff00b8, #ff0000); }
@@ -117,35 +126,52 @@
     }
     
     async function listContents(path = '', table, basePath = '') {
-        const contents = await fetchContents(path);
+    const contents = await fetchContents(path);
+    
+    for (const item of contents) {
+        const commitData = await fetchCommitData(item.path);
+        const row = table.insertRow();
+        const nameCell = row.insertCell(0);
+        const typeCell = row.insertCell(1);
+        const createdCell = row.insertCell(2);
+        const modifiedCell = row.insertCell(3);
         
-        for (const item of contents) {
-            const commitData = await fetchCommitData(item.path);
-            const row = table.insertRow();
-            const nameCell = row.insertCell(0);
-            const typeCell = row.insertCell(1);
-            const createdCell = row.insertCell(2);
-            const modifiedCell = row.insertCell(3);
+        const fullPath = basePath ? `${basePath}/${item.name}` : item.name;
+        
+        if (item.type === 'dir') {
+            const details = document.createElement("details");
+            const summary = document.createElement("summary");
+            summary.innerHTML = `<i class="bi bi-folder"></i> ${fullPath}`;
+            details.appendChild(summary);
             
-            const fullPath = basePath ? `${basePath}/${item.name}` : item.name;
+            const subTable = document.createElement("table");
+            subTable.style.marginLeft = "20px";
+            details.appendChild(subTable);
+            
+            summary.addEventListener("click", async () => {
+                if (!details.hasAttribute("data-loaded")) {
+                    await listContents(item.path, subTable, fullPath);
+                    details.setAttribute("data-loaded", "true");
+                }
+            });
+            
+            nameCell.appendChild(details);
+        } else {
             const link = document.createElement("a");
             link.href = `https://cdn-mango.nexalinux.xyz/${fullPath}`;
-            link.innerHTML = item.type === 'dir' 
-                ? '<i class="bi bi-folder"></i> ' + fullPath
-                : '<i class="bi bi-file-earmark"></i> ' + fullPath;
+            link.innerHTML = `<i class="bi bi-file-earmark"></i> ${fullPath}`;
             link.target = "_blank";
             nameCell.appendChild(link);
-            typeCell.innerHTML = item.type === 'dir' 
-                ? '<i class="bi bi-folder"></i> Directory' 
-                : '<i class="bi bi-file-earmark"></i> File';
-            createdCell.textContent = commitData.created;
-            modifiedCell.textContent = commitData.modified;
-            
-            if (item.type === 'dir') {
-                await listContents(item.path, table, fullPath);
-            }
         }
+        
+        typeCell.innerHTML = item.type === 'dir' 
+            ? '<i class="bi bi-folder"></i> Directory' 
+            : '<i class="bi bi-file-earmark"></i> File';
+        createdCell.textContent = commitData.created;
+        modifiedCell.textContent = commitData.modified;
     }
+}
+
     
     listContents('', container, '');
     
