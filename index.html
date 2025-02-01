@@ -131,8 +131,8 @@
             const link = document.createElement("a");
             link.href = `https://cdn-mango.nexalinux.xyz/${fullPath}`;
             link.innerHTML = item.type === 'dir' 
-                ? '<i class="bi bi-folder"></i> ' + item.name
-                : '<i class="bi bi-file-earmark"></i> ' + item.name;
+                ? '<i class="bi bi-folder"></i> ' + fullPath
+                : '<i class="bi bi-file-earmark"></i> ' + fullPath;
             link.target = "_blank";
             nameCell.appendChild(link);
             typeCell.innerHTML = item.type === 'dir' 
