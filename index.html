@@ -2,6 +2,8 @@
 <html>
     <head>
         <title>File listing</title>
+        <meta property="og:title" content="Directory listing">
+        <meta property="og:description" content="Shows a directory listing for this website">
         <link rel="stylesheet" 
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
   <style>
@@ -106,6 +108,7 @@
         const response = await fetch(`${apiUrl}${path}`);
         if (!response.ok) {
             console.error("Error fetching", path, response.statusText);
+            container.innerHTML += "<p>Error fetching " + path + " " + response.statusText + "</p>"
             return [];
         }
         return response.json();
