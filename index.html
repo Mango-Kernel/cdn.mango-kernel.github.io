@@ -1,1 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>File listing</title>
+    </head>
+    <body>
+        <h1 id="dirlistrepo">Directory listing for [repo]</h4>
+        <p id="dirlistrepoowner">By [repoowner]</p>
+        <table id="repot">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Created</th>
+                    <th>Modified</th>
+                </tr>
+            </thead>
+            <tbody id="repo-table"></tbody>
+        </table>
+        <script>
+            async function fetchGitHubRepoContents(repo) {
+    const apiUrl = `https://api.github.com/repos/${repo}/contents/`;
+    const commitsApiUrl = `https://api.github.com/repos/${repo}/commits?path=`;
+    const container = document.getElementById("repo-table");
+    
+    async function fetchContents(path = '') {
+        const response = await fetch(`${apiUrl}${path}`);
+        if (!response.ok) {
+            console.error("Error fetching", path, response.statusText);
+            return [];
+        }
+        return response.json();
+    }
+    
+    async function fetchCommitData(path) {
+        const response = await fetch(`${commitsApiUrl}${path}`);
+        if (!response.ok) {
+            console.error("Error fetching commit data for", path, response.statusText);
+            return { created: "N/A", modified: "N/A" };
+        }
+        const commits = await response.json();
+        if (commits.length === 0) return { created: "N/A", modified: "N/A" };
+        return {
+            created: commits[commits.length - 1].commit.author.date,
+            modified: commits[0].commit.author.date,
+        };
+    }
+    
+    async function listContents(path = '', table, basePath = '') {
+        const contents = await fetchContents(path);
+        
+        for (const item of contents) {
+            const commitData = await fetchCommitData(item.path);
+            const row = table.insertRow();
+            const nameCell = row.insertCell(0);
+            const typeCell = row.insertCell(1);
+            const createdCell = row.insertCell(2);
+            const modifiedCell = row.insertCell(3);
+            
+            const fullPath = basePath ? `${basePath}/${item.name}` : item.name;
+            const link = document.createElement("a");
+            link.href = `https://cdn-mango.nexalinux.xyz/${fullPath}`;
+            link.textContent = fullPath;
+            link.target = "_blank";
+            nameCell.appendChild(link);
+            typeCell.innerHTML = item.type === 'dir' 
+                ? '<i class="bi bi-folder"></i> Directory' 
+                : '<i class="bi bi-file-earmark"></i> File';
+            createdCell.textContent = commitData.created;
+            modifiedCell.textContent = commitData.modified;
+            
+            if (item.type === 'dir') {
+                await listContents(item.path, table, fullPath);
+            }
+        }
+    }
+    
+    listContents('', container, '');
+    
+    const [repoOwner, repoName] = repo.split('/');
+    document.getElementById("dirlistrepo").textContent = `Directory listing for ${repoName}`;
+    document.getElementById("dirlistrepoowner").textContent = `By ${repoOwner}`;
+}
 
+document.addEventListener("DOMContentLoaded", () => {
+    fetchGitHubRepoContents("Mango-Kernel/cdn.mango-kernel.github.io");
+});
+
+document.head.insertAdjacentHTML("beforeend", `
+    <link rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            margin-left: 300px;
+            margin-right: 300px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+`);
+
+        </script>
+    </body>
+</html>
