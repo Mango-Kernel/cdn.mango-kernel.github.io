@@ -28,9 +28,9 @@
         "desc": "A lightweight OS",
         "source": "/packages/",
         "checksum": "",
-        "version": 0.2.5.7,
+        "version": "0.2.5.7",
         "files": [
-            "potatoOS-2.5.7.iso.xz",
+            "potatoOS-2.5.7.iso.xz"
         ],
         "install_path": "./",
         "libs": []
