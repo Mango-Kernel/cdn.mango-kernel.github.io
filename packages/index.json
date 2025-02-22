@@ -1,3 +1,20 @@
 [
-  
+    {
+        "name": "Test",
+        "tags": [
+            "test"
+        ],
+        "auther": "test",
+        "license": "MIT",
+        "desc": "Test Package",
+        "source": "/packages/",
+        "checksum": "",
+        "version": 0.1,
+        "files": [
+            "test.bin",
+            "test.sh"
+        ],
+        "install_path": "/bin",
+        "libs": []
+    }
 ]
