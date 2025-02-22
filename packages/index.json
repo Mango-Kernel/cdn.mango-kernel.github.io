@@ -16,5 +16,23 @@
         ],
         "install_path": "/bin",
         "libs": []
+    },
+    {
+        "name": "PotatoOS",
+        "tags": [
+            "OS",
+            "Kernel"
+        ],
+        "author": "winvistalover",
+        "license": "MIT",
+        "desc": "A lightweight OS",
+        "source": "/packages/",
+        "checksum": "",
+        "version": 0.2.5.7,
+        "files": [
+            "potatoOS-2.5.7.iso.xz",
+        ],
+        "install_path": "./",
+        "libs": []
     }
 ]
