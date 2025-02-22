@@ -4,7 +4,7 @@
         "tags": [
             "test"
         ],
-        "auther": "test",
+        "author": "test",
         "license": "MIT",
         "desc": "Test Package",
         "source": "/packages/",
